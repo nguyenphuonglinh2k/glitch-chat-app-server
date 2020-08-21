@@ -1,34 +1,69 @@
-// server.js
-// where your node app starts
+const port = process.env.PORT || 5000 
+const express = require('express')
+const mongoose = require('mongoose')
+const bodyParser = require('body-parser')
+const cors = require('cors')
 
-// we've started you off with Express (https://expressjs.com/)
-// but feel free to use whatever libraries or frameworks you'd like through `package.json`.
-const express = require("express");
-const app = express();
+const accountRoute = require('./routes/account.route');
+const chatRoute = require('./routes/chat.route');
+const Message = require('./models/message.model');
 
-// our default array of dreams
-const dreams = [
-  "Find and count some sheep",
-  "Climb a really tall mountain",
-  "Wash the dishes"
-];
+const app = express()
+const http = require("http").Server(app);
+const io = require("socket.io")(http);
 
-// make all the files in 'public' available
-// https://expressjs.com/en/starter/static-files.html
-app.use(express.static("public"));
-
-// https://expressjs.com/en/starter/basic-routing.html
-app.get("/", (request, response) => {
-  response.sendFile(__dirname + "/views/index.html");
+//connect mongoDB
+mongoose.connect('mongodb+srv://Linhkeo:PkCKifOarK85NHqy@cluster0.femwd.mongodb.net/tiko-realtime', 
+    {useNewUrlParser: true, useUnifiedTopology: true}
+);
+mongoose.connection.on('connected', () => {
+        console.log('connected to mongo yeahh!');
+    });
+mongoose.connection.on('error', (err) => {
+    console.log('error connecting:', err);
 });
 
-// send the default array of dreams to the webpage
-app.get("/dreams", (request, response) => {
-  // express helps us take JS objects and send them as JSON
-  response.json(dreams);
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, x-client-key, x-client-token, x-client-secret, Authorization");
+  next();
 });
 
-// listen for requests :)
-const listener = app.listen(process.env.PORT, () => {
-  console.log("Your app is listening on port " + listener.address().port);
+app.use(bodyParser.json()) // for parsing application/json
+app.use(cors())
+app.use(bodyParser.urlencoded({ extended: true })) 
+
+io.on("connection", function(socket) {
+  socket.on("send-message", async function({mess, time, channelId, user}) {
+    let newMessage = new Message({
+      content: mess,
+      channelId,
+      time,
+      user: JSON.parse(user)
+    });
+
+    let messages = await Message.find({channelId});
+
+    newMessage.save((err, newMessage) => {
+      if (err) {
+          console.log(err);
+      }
+      console.log('Saved successfully');
+    });
+
+    return io.sockets.emit("message-res", [...messages, newMessage]);
+  });
 });
+
+app.use('/account', accountRoute);
+app.use('/chat', chatRoute);
+
+app.use('/', (req, res) => {
+  res.send('welcome to Chat App API!')  
+});
+
+http.listen(port, function() {
+  console.log("Listening on *:" + port);
+})
+

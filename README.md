@@ -1,30 +1,27 @@
-# hello-express
+# React Express Example
+This is a real-time chat app project. You can create channel to chat with each other.
+A few features in this app:
+<ol>
+<li>Sign in, sign up, reset password with your email</li>
+<li>Send message</li>
+<li>Create channel to start conversations</li>
+</ol>
 
-A server that serves a webpage, its resources, and some data
+## About the app 
+This is a API server (in Node/Express)
+Actually, there are two separated apps. The Client which serves the FrontEnd (using React), and the API (in Node/Express).
 
+## Prerequisites
+In order to run this project node.js and npm both need to have been installed.
 
-## Your Project
+## Deployment
+<ol>
+<li>Clone this repo</li>
+<li>Run `npm start` to start the Express server.</li>
+<li>Visit http://localhost:5000/</li>
+</ol>
 
-On the front-end,
-
-- Edit `views/index.html` to change the content of the webpage
-- `public/client.js` is the javacript that runs when you load the webpage
-- `public/style.css` is the styles for `views/index.html`
-- Drag in `assets`, like images or music, to add them to your project
-
-On the back-end,
-
-- your app starts at `server.js`
-- add frameworks and packages in `package.json`
-- safely store app secrets in `.env` (nobody can see this but you and people you invite)
-
-Click `Show` in the header to see your app live. Updates to your code will instantly deploy.
-
-
-## Made by [Glitch](https://glitch.com/)
-
-**Glitch** is the friendly community where you'll build the app of your dreams. Glitch lets you instantly create, remix, edit, and host an app, bot or site, and you can invite collaborators or helpers to simultaneously edit code with you.
-
-Find out more [about Glitch](https://glitch.com/about).
-
-( ᵔ ᴥ ᵔ )
+## Built With
+* [Nodemailer](https://nodemailer.com/)
+* [Express.js](https://expressjs.com/)
+* [Mongoose](https://mongoosejs.com/)
